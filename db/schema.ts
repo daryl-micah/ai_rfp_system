@@ -18,7 +18,7 @@ export const rfps = pgTable("rfps", {
 export const vendors = pgTable("vendors", {
   id: serial("id").primaryKey(),
   name: text("name"),
-  email: text("email"),
+  email: text("email").notNull(),
   contact: text("contact"),
   createdAt: timestamp("created_at").defaultNow(),
 });
