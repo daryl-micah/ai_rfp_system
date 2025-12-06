@@ -12,7 +12,7 @@ export default function ComparePage({ params }: any) {
   }
 
   async function recommend() {
-    const res = await fetch(`/api/rfp/${params.id}/recommend`);
+    const res = await fetch(`/api/rfps/${params.id}/recommend`);
     setRec(await res.json());
   }
 

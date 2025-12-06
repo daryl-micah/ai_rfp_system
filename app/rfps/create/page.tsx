@@ -10,7 +10,7 @@ export default function CreateRFPPage() {
   const generate = async () => {
     try {
       setLoading(true);
-      const res = await fetch("/api/rfp/from-text", {
+      const res = await fetch("/api/rfps/from-text", {
         method: "POST",
         body: JSON.stringify({ text }),
       });
