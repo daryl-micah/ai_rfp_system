@@ -3,63 +3,62 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 
-type Rfp = {
-  id: number;
-  title: string;
-  createdAt: string;
-};
-
-export default function DashboardPage() {
-  const [rfps, setRfps] = useState<Rfp[]>([]);
-  const [loading, setLoading] = useState(true);
+export default function Dashboard() {
+  const [rfps, setRfps] = useState<any[]>([]);
 
   useEffect(() => {
     fetch("/api/rfps")
       .then((res) => res.json())
-      .then((data) => setRfps(data))
-      .finally(() => setLoading(false));
+      .then(setRfps);
   }, []);
 
+  const handleDelete = async (id: number, e: React.MouseEvent) => {
+    e.preventDefault();
+    if (!confirm("Are you sure you want to delete this RFP?")) return;
+
+    try {
+      const res = await fetch(`/api/rfps/${id}`, { method: "DELETE" });
+      if (res.ok) {
+        setRfps(rfps.filter((rfp) => rfp.id !== id));
+      }
+    } catch (error) {
+      console.error("Failed to delete RFP:", error);
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
-      {/* Header */}
+    <div className="p-10 max-w-6xl mx-auto">
       <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold">📊 RFP Dashboard</h1>
+        <h1 className="text-3xl font-bold">RFP Dashboard</h1>
         <Link
           href="rfps/create"
-          className="bg-black text-white px-4 py-2 rounded-lg hover:opacity-90"
+          className="bg-black text-white px-4 py-2 rounded"
         >
           + Create RFP
         </Link>
       </div>
 
-      {/* Content */}
-      {loading ? (
-        <p className="text-gray-500">Loading RFPs...</p>
-      ) : rfps.length === 0 ? (
-        <div className="bg-white p-6 rounded-lg shadow text-center">
-          <p className="text-gray-500 mb-4">No RFPs created yet</p>
-          <Link href="/create" className="underline text-blue-600">
-            Create your first RFP →
-          </Link>
-        </div>
-      ) : (
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {rfps.map((rfp) => (
-            <Link
-              key={rfp.id}
-              href={`/rfps/${rfp.id}`}
-              className="bg-white p-6 rounded-xl shadow hover:shadow-lg transition"
-            >
-              <h2 className="font-semibold text-lg mb-2">{rfp.title}</h2>
-              <p className="text-sm text-gray-500">
-                Created on {new Date(rfp.createdAt).toLocaleDateString()}
+      <div className="grid grid-cols-3 gap-6">
+        {rfps.map((rfp) => (
+          <div
+            key={rfp.id}
+            className="border rounded-lg p-5 hover:shadow-lg transition relative"
+          >
+            <Link href={`/rfps/${rfp.id}`}>
+              <h2 className="font-semibold text-lg">{rfp.title}</h2>
+              <p className="text-xs text-gray-400 mt-3">
+                Created {new Date(rfp.createdAt).toLocaleDateString()}
               </p>
-              <div className="mt-4 text-blue-600 text-sm">View Details →</div>
             </Link>
-          ))}
-        </div>
-      )}
+            <button
+              onClick={(e) => handleDelete(rfp.id, e)}
+              className="absolute bottom-5 right-3 text-red-500 hover:text-red-700 text-sm"
+            >
+              Delete
+            </button>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
