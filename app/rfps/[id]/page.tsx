@@ -12,6 +12,7 @@ export default function RfpDetail() {
   const [vendors, setVendors] = useState<any[]>([]);
   const [selectedVendorIds, setSelectedVendorIds] = useState<number[]>([]);
   const [sending, setSending] = useState(false);
+  const [polling, setPolling] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
 
   useEffect(() => {
@@ -24,10 +25,43 @@ export default function RfpDetail() {
       .then(setVendors);
   }, [params.id]);
 
+  const loadRfpData = async () => {
+    const res = await fetch(`/api/rfps/${params.id}`);
+    const newData = await res.json();
+    setData(newData);
+  };
+
   const toggleVendor = (id: number) => {
     setSelectedVendorIds((prev) =>
       prev.includes(id) ? prev.filter((v) => v !== id) : [...prev, id]
     );
+  };
+
+  const handlePollEmails = async () => {
+    setPolling(true);
+    setMessage(null);
+
+    try {
+      const res = await fetch("/api/email/poll");
+      const result = await res.json();
+
+      if (res.ok) {
+        if (result.processed > 0) {
+          setMessage(`✓ Processed ${result.processed} new proposal(s)`);
+          // Reload RFP data to show new proposals
+          await loadRfpData();
+        } else {
+          setMessage("ℹ No new emails found");
+        }
+      } else {
+        setMessage(`✗ Error: ${result.error || "Failed to poll emails"}`);
+      }
+    } catch (error) {
+      console.error(error);
+      setMessage("✗ Failed to poll emails");
+    } finally {
+      setPolling(false);
+    }
   };
 
   const handleSendRfp = async () => {
@@ -145,15 +179,25 @@ export default function RfpDetail() {
             ))}
           </div>
 
-          <button
-            onClick={handleSendRfp}
-            disabled={sending || selectedVendorIds.length === 0}
-            className="bg-emerald-500 text-slate-950 px-4 py-2 rounded-md hover:bg-emerald-400 disabled:opacity-50 disabled:cursor-not-allowed transition font-medium"
-          >
-            {sending
-              ? "Sending..."
-              : `Send to ${selectedVendorIds.length} vendor(s)`}
-          </button>
+          <div className="flex gap-2 justify-center">
+            <button
+              onClick={handleSendRfp}
+              disabled={sending || selectedVendorIds.length === 0}
+              className="bg-emerald-500 text-slate-950 px-4 py-2 rounded-md hover:bg-emerald-400 disabled:opacity-50 disabled:cursor-not-allowed transition font-medium"
+            >
+              {sending
+                ? "Sending..."
+                : `Send to ${selectedVendorIds.length} vendor(s)`}
+            </button>
+
+            <button
+              onClick={handlePollEmails}
+              disabled={polling}
+              className="bg-blue-500 text-slate-950 px-4 py-2 rounded-md hover:bg-blue-400 disabled:opacity-50 disabled:cursor-not-allowed transition font-medium"
+            >
+              {polling ? "Polling..." : "Poll for Proposals"}
+            </button>
+          </div>
         </section>
 
         {/* Proposals */}

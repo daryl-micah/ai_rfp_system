@@ -25,7 +25,7 @@ export const vendors = pgTable("vendors", {
 
 export const proposals = pgTable("proposals", {
   id: serial("id").primaryKey(),
-  rfpId: integer("rfp_id").references(() => rfps.id),
+  rfpId: integer("rfp_id").references(() => rfps.id, { onDelete: "cascade" }),
   vendorId: integer("vendor_id").references(() => vendors.id),
   parsed: jsonb("parsed"),
   aiSummary: text("ai_summary"),
