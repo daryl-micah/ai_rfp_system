@@ -52,6 +52,15 @@ export async function parseVendorEmail(email: string) {
     Email: ${email}`);
 }
 
+// generate AI summary for a proposal
+export async function generateProposalSummary(proposalData: any) {
+  return await runGroq(`Summarize this vendor proposal in 1-2 sentences highlighting key points (price, delivery, warranty):
+    
+    ${JSON.stringify(proposalData, null, 2)}
+    
+    Return JSON: { "summary": "..." }`);
+}
+
 // compare proposals
 export async function compareProposals(proposals: any[]) {
   return await runGroq(`

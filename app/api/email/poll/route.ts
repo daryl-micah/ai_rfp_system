@@ -1,7 +1,7 @@
 import { db } from "@/db/drizzle";
 import { proposals, vendors, rfps } from "@/db/schema";
 import { getImapClient } from "@/lib/imapClient";
-import { parseVendorEmail } from "@/lib/llmClient";
+import { parseVendorEmail, generateProposalSummary } from "@/lib/llmClient";
 import { eq, desc } from "drizzle-orm";
 
 export async function GET() {
@@ -45,18 +45,22 @@ export async function GET() {
 
     // Parse the email using LLM
     let parsed;
+    let aiSummary;
     try {
       parsed = await parseVendorEmail(body);
+      const summaryResult = await generateProposalSummary(parsed);
+      aiSummary = summaryResult.summary;
     } catch (error) {
       console.error("LLM parsing failed:", error);
       continue;
     }
 
-    // Save proposal
+    // Save proposal with AI summary
     await db.insert(proposals).values({
       vendorId: vendor[0].id,
       rfpId,
       parsed,
+      aiSummary,
       rawEmail: body,
     });
 
