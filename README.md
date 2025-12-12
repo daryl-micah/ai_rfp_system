@@ -22,12 +22,6 @@ A modern web application that streamlines the Request for Proposal (RFP) procure
 - **Receive Proposals**: Poll IMAP inbox for vendor responses
 - **Auto-parse**: AI extracts pricing, delivery terms, warranty info from email responses
 
-### 4. AI-Powered Comparison
-
-- View all proposals side-by-side in a comparison table
-- AI-generated summaries for each proposal
-- Get AI recommendations on the best vendor based on multiple criteria
-
 ## 🏗️ Architecture & Design Decisions
 
 ### Tech Stack
