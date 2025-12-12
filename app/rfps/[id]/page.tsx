@@ -123,14 +123,14 @@ export default function RfpDetail() {
               Created {new Date(data.rfp.createdAt).toLocaleDateString()}
             </p>
           </div>
-          {hasProposals && (
+          {/* {hasProposals && (
             <Link
               href={`/compare/${params.id}`}
               className="bg-emerald-500 text-slate-950 px-4 py-2 rounded-md hover:bg-emerald-400 transition font-medium"
             >
               Compare Proposals
             </Link>
-          )}
+          )} */}
         </div>
 
         {/* RFP Details */}
